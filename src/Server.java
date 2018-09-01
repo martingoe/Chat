@@ -18,8 +18,7 @@ class Server {
         try {
             serverSocket = new ServerSocket(5555);
 
-            System.out.println("Started Server.");
-
+            //All the UI
             JFrame frame = new JFrame("Server");
             JButton stopServer = new JButton("Stop Server");
             stopServer.addActionListener(e -> System.exit(0));
@@ -30,41 +29,40 @@ class Server {
             frame.add(stopServer);
             frame.setVisible(true);
 
+            //Handles  new users
             new Thread(new Handle()).start();
+
+            //Constantly checks for messages and sends them to everyone if there are some
             while (true) {
-                System.out.println(Arrays.toString(clients.toArray()));
-                clients.forEach(socket -> {
-                    System.out.println(socket.getLocalAddress());
+                Socket[] clientsArr = clients.toArray(new Socket[0]);
+                for(Socket socket : clientsArr){
                     String s;
                     try {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                         if(reader.ready()){
                             s = reader.readLine();
-                            System.out.println("new Message: " + s);
 
-                            clients.forEach(socket1 -> {
+                            //Send back to everyone
+                            for(Socket socket1 : clientsArr){
 
                                 try {
                                     PrintWriter writer = new PrintWriter(socket1.getOutputStream());
                                     writer.write(s + "\n");
                                     writer.flush();
 
-                                    System.out.println("Sent " + s + "back.");
 
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
-                            });
+                            }
                         }
-                        else {
-                            System.out.println("Nothing to read.");
-                        }
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
-                });
+                }
 
             }
 
