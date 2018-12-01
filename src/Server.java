@@ -6,13 +6,10 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 class Server {
-    public static ArrayList<Socket> clients = new ArrayList<>();
-    public static ServerSocket serverSocket;
+    static ArrayList<Socket> clients = new ArrayList<>();
+    static ServerSocket serverSocket;
 
     public static void main(String[] args) {
         try {
@@ -35,37 +32,32 @@ class Server {
             //Constantly checks for messages and sends them to everyone if there are some
             while (true) {
                 Socket[] clientsArr = clients.toArray(new Socket[0]);
-                for(Socket socket : clientsArr){
+                for (Socket socket : clientsArr) {
                     String s;
                     try {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                        if(reader.ready()){
+                        if (reader.ready()) {
                             s = reader.readLine();
+                            System.out.println("Received: " + s);
 
                             //Send back to everyone
-                            for(Socket socket1 : clientsArr){
-
+                            for (Socket socket1 : clientsArr) {
                                 try {
                                     PrintWriter writer = new PrintWriter(socket1.getOutputStream());
                                     writer.write(s + "\n");
                                     writer.flush();
-
 
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
                             }
                         }
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
                 }
-
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
