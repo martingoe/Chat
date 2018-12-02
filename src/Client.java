@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Client extends Application {
 
-    String name;
+    private String name;
 
     public static void main(String[] args) {
         System.out.println("Starting Client");
