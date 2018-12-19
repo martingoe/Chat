@@ -33,8 +33,13 @@ public class Client extends Application {
     public void start(Stage primaryStage) throws Exception {
         //The data is an Atomic as it has to be edited in a Lambda
         AtomicReference<String> data = new AtomicReference<>("");
-        //Connect to the server on the localhost. Port: 5555
-        Socket client = new Socket("localhost", 5555);
+
+        //Gather information about the server and its port
+        String server = getInformation("server");
+        String port = getInformation("port");
+        //Connect to the server on the server
+        assert port != null;
+        Socket client = new Socket(server, Integer.parseInt(port));
         System.out.println("Started Client");
 
         //Declare a PrintWriter using the OutputStream to write to the Server
@@ -45,7 +50,7 @@ public class Client extends Application {
         InputStream inputStream = client.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
-        getUsername();
+        name = getInformation("username");
 
         //Declare a TextField to write messages
         TextField in = new TextField();
@@ -125,12 +130,12 @@ public class Client extends Application {
 
     }
 
-    private void getUsername() {
+    private String getInformation(String type) {
 
         //Ask the user for the username to be used
         TextInputDialog nameDialog = new TextInputDialog();
-        nameDialog.setTitle("Username");
-        nameDialog.setContentText("Please enter your username: ");
+        nameDialog.setTitle(type);
+        nameDialog.setContentText("Please enter your " + type + ": ");
 
         //Save the response to a Optional and see if it is existing
         Optional<String> nameResult = nameDialog.showAndWait();
@@ -139,17 +144,18 @@ public class Client extends Application {
             name = nameResult.get();
             //Return if the name is not empty
             if (!(name.equals("") || name.equals(" ")))
-                return;
+                return name;
         }
-        //Only executed if username is empty or not existing
+        // -----------------------Only executed if username is empty or not existing----------------------------
 
         //Tell the user to try again using a valid username
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Username");
-        alert.setHeaderText("Please enter a valid username");
+        alert.setTitle(type);
+        alert.setHeaderText("Please enter a valid " + type);
         alert.showAndWait();
 
         //Restart the function
-        getUsername();
+        getInformation(type);
+        return null;
     }
 }
